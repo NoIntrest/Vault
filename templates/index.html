@@ -471,6 +471,40 @@ body::after{
 .progress-status.over{color:var(--red);}
 .budget-special-badge{font-size:0.65rem;padding:2px 8px;border-radius:20px;background:var(--amber-soft);color:var(--amber);border:1px solid rgba(232,160,32,0.3);margin-left:8px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;vertical-align:middle;}
 
+/* ── CSV Import / Export Page ────────────────────────────────── */
+.csv-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:960px;}
+.csv-card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:32px;}
+.csv-card-title{font-size:0.7rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--orange);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.csv-card-desc{font-size:0.82rem;color:var(--ink2);line-height:1.7;margin-bottom:22px;}
+.csv-month-row{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;}
+.csv-select{padding:10px 14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:0.86rem;color:var(--ink);cursor:pointer;transition:border-color 0.18s;}
+.csv-select:focus{outline:none;border-color:var(--orange);}
+.csv-btn{padding:11px 24px;background:var(--grad-card);border:none;border-radius:8px;color:#fff;font-family:'Outfit',sans-serif;font-size:0.84rem;font-weight:700;letter-spacing:0.06em;cursor:pointer;transition:opacity 0.2s,transform 0.15s;white-space:nowrap;}
+.csv-btn:hover{opacity:0.9;transform:translateY(-1px);}
+.csv-btn.secondary{background:var(--surface);border:1.5px solid var(--border);color:var(--ink2);}
+.csv-btn.secondary:hover{border-color:var(--orange);color:var(--orange);}
+.csv-drop{border:2px dashed var(--border);border-radius:12px;padding:36px 20px;text-align:center;cursor:pointer;transition:all 0.2s;margin-bottom:16px;background:var(--surface2);}
+.csv-drop:hover,.csv-drop.drag-over{border-color:var(--orange);background:var(--orange-soft);}
+.csv-drop-icon{font-size:2rem;margin-bottom:8px;opacity:0.4;}
+.csv-drop-text{font-size:0.82rem;color:var(--ink3);line-height:1.6;}
+.csv-drop-text strong{color:var(--ink2);}
+.csv-file-input{display:none;}
+.csv-result{margin-top:16px;padding:14px 18px;border-radius:10px;font-size:0.82rem;line-height:1.7;display:none;}
+.csv-result.success{background:var(--green-soft);border:1px solid rgba(42,154,80,0.25);color:var(--green);}
+.csv-result.error{background:var(--red-soft);border:1px solid rgba(224,60,42,0.25);color:var(--red);}
+.csv-result.warn{background:var(--amber-soft);border:1px solid rgba(232,160,32,0.25);color:#7a5000;}
+.csv-format-card{background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-top:20px;max-width:960px;}
+.csv-format-title{font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px;}
+.csv-table{width:100%;border-collapse:collapse;font-size:0.78rem;}
+.csv-table th{text-align:left;padding:7px 12px;background:var(--border);color:var(--ink2);font-weight:700;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;}
+.csv-table th:first-child{border-radius:6px 0 0 6px;}
+.csv-table th:last-child{border-radius:0 6px 6px 0;}
+.csv-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--ink2);font-family:'JetBrains Mono',monospace;font-size:0.75rem;}
+.csv-table tr:last-child td{border-bottom:none;}
+.csv-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.65rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;}
+.csv-tag.req{background:var(--red-soft);color:var(--red);}
+.csv-tag.opt{background:var(--green-soft);color:var(--green);}
+
 @media(max-width:900px){
   .sidebar{width:200px;}
   .main{margin-left:200px;padding:28px;}
@@ -479,6 +513,7 @@ body::after{
   .dash-grid{grid-template-columns:1fr;}
   .ai-layout{grid-template-columns:1fr;}
   .settings-grid{grid-template-columns:1fr;}
+  .csv-grid{grid-template-columns:1fr;}
   .auth-split{grid-template-columns:1fr;}
   .auth-left{display:none;}
   .budget-cat-row{flex-wrap:wrap;}
@@ -530,6 +565,7 @@ body::after{
       <div class="nav-section-label">Tools</div>
       <div class="nav-item" onclick="showPage('ai')"><span class="nav-icon">🤖</span> AI Advisor</div>
       <div class="nav-item" onclick="showPage('budget')"><span class="nav-icon">📋</span> Budget</div>
+      <div class="nav-item" onclick="showPage('csv')"><span class="nav-icon">⇅</span> Import / Export</div>
       <div class="nav-item" onclick="showPage('settings')"><span class="nav-icon">⚙</span> Settings</div>
     </nav>
     <div class="sidebar-bottom">
@@ -763,6 +799,68 @@ body::after{
         <div style="margin-top:20px;">
           <button class="budget-save-btn" style="background:var(--surface);border:1.5px solid var(--border);color:var(--ink2);" onclick="switchBudgetTab('setup')">← Edit Goals</button>
         </div>
+      </div>
+    </div>
+
+    <!-- CSV Import / Export -->
+    <div class="page" id="page-csv">
+      <div class="page-header">
+        <div class="page-title">Import / Export</div>
+        <div class="page-sub">Backup your data or bring in transactions from another app</div>
+      </div>
+
+      <div class="csv-grid">
+
+        <!-- Export -->
+        <div class="csv-card">
+          <div class="csv-card-title">⬇ Export to CSV</div>
+          <p class="csv-card-desc">Download your transactions as a spreadsheet-compatible CSV file. Choose a specific month or grab everything at once.</p>
+          <div class="csv-month-row">
+            <select class="csv-select" id="export-month-select">
+              <option value="all">All time</option>
+              <!-- Options populated by JS -->
+            </select>
+            <button class="csv-btn" onclick="exportCSV()">Download CSV</button>
+          </div>
+          <p style="font-size:0.72rem;color:var(--ink3);">Opens directly in Excel, Google Sheets, or Numbers.</p>
+        </div>
+
+        <!-- Import -->
+        <div class="csv-card">
+          <div class="csv-card-title">⬆ Import from CSV</div>
+          <p class="csv-card-desc">Upload a CSV file to bulk-add transactions. Rows that pass validation are inserted; invalid rows are skipped and reported.</p>
+          <div class="csv-drop" id="csv-drop-zone" onclick="document.getElementById('csv-file-input').click()">
+            <div class="csv-drop-icon">📂</div>
+            <div class="csv-drop-text"><strong>Click to choose a file</strong><br/>or drag &amp; drop it here<br/><span style="font-size:0.7rem;">.csv files only</span></div>
+          </div>
+          <input type="file" id="csv-file-input" class="csv-file-input" accept=".csv" onchange="handleFileSelect(this)"/>
+          <div id="csv-import-result" class="csv-result"></div>
+        </div>
+
+      </div>
+
+      <!-- Format reference -->
+      <div class="csv-format-card">
+        <div class="csv-format-title">📋 Expected CSV format</div>
+        <table class="csv-table">
+          <thead>
+            <tr>
+              <th>Column</th>
+              <th>Required</th>
+              <th>Format / Example</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>date</td><td><span class="csv-tag req">Required</span></td><td>2025-03-15</td><td>YYYY-MM-DD</td></tr>
+            <tr><td>type</td><td><span class="csv-tag req">Required</span></td><td>expense</td><td>income or expense</td></tr>
+            <tr><td>amount</td><td><span class="csv-tag req">Required</span></td><td>1250.00</td><td>Positive number, no currency symbol</td></tr>
+            <tr><td>currency</td><td><span class="csv-tag opt">Optional</span></td><td>INR</td><td>3-letter code — defaults to your display currency</td></tr>
+            <tr><td>category</td><td><span class="csv-tag opt">Optional</span></td><td>🍔 Food</td><td>Defaults to "Other" / "Income"</td></tr>
+            <tr><td>note</td><td><span class="csv-tag opt">Optional</span></td><td>Dinner with friends</td><td>Free text</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:0.72rem;color:var(--ink3);margin-top:12px;">Tip: Export a month first to see the exact format your import file should follow.</p>
       </div>
     </div>
 
@@ -1037,11 +1135,12 @@ function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  const map={dashboard:0,transactions:1,add:2,ai:3,budget:4,settings:5};
+  const map={dashboard:0,transactions:1,add:2,ai:3,budget:4,csv:5,settings:6};
   document.querySelectorAll('.nav-item')[map[name]]?.classList.add('active');
   if(name==='dashboard')loadDashboard();
   if(name==='transactions')loadTransactions();
   if(name==='settings'){fetchRates();buildRatesGrid();}
+  if(name==='csv'){initCsvPage();}
   if(name==='budget'){loadBudgetPage();}
 }
 
@@ -1521,6 +1620,116 @@ async function renderBudgetProgress(){
   }catch(e){
     grid.innerHTML='<div class="empty"><div class="empty-text">Failed to load progress.</div></div>';
   }
+}
+
+// ── CSV Import / Export ───────────────────────────────────────────
+function initCsvPage(){
+  buildExportMonthSelect();
+  setupDropZone();
+}
+
+// Populate the month dropdown with the last 24 months + "All time"
+function buildExportMonthSelect(){
+  const sel = document.getElementById('export-month-select');
+  if(!sel) return;
+  // Keep the "All time" option (value="all"), then add months
+  while(sel.options.length > 1) sel.remove(1);
+  const now = new Date();
+  for(let i = 0; i < 24; i++){
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const val = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    const label = d.toLocaleDateString('en-GB', {month:'long', year:'numeric'});
+    const opt = document.createElement('option');
+    opt.value = val;
+    opt.textContent = label;
+    if(i === 0) opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+
+function exportCSV(){
+  const month = document.getElementById('export-month-select').value;
+  // Trigger browser download by navigating to the endpoint
+  window.location.href = '/api/transactions/export?month=' + month;
+}
+
+// ── Drag & drop ───────────────────────────────────────────────────
+function setupDropZone(){
+  const zone = document.getElementById('csv-drop-zone');
+  if(!zone) return;
+
+  zone.addEventListener('dragover', e => {
+    e.preventDefault();
+    zone.classList.add('drag-over');
+  });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if(file) uploadCSV(file);
+  });
+}
+
+function handleFileSelect(input){
+  if(input.files[0]) uploadCSV(input.files[0]);
+}
+
+async function uploadCSV(file){
+  if(!file.name.toLowerCase().endsWith('.csv')){
+    showImportResult('error', '✕ File must be a .csv');
+    return;
+  }
+
+  const zone = document.getElementById('csv-drop-zone');
+  zone.innerHTML = '<div class="csv-drop-icon" style="animation:blink 1s infinite">⏳</div><div class="csv-drop-text">Uploading...</div>';
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try{
+    const res  = await fetch('/api/transactions/import', { method:'POST', body: formData });
+    const data = await res.json();
+
+    // Reset drop zone
+    zone.innerHTML = '<div class="csv-drop-icon">📂</div><div class="csv-drop-text"><strong>Click to choose a file</strong><br/>or drag &amp; drop it here<br/><span style="font-size:0.7rem;">.csv files only</span></div>';
+
+    if(!res.ok){
+      showImportResult('error', '✕ ' + (data.error || 'Import failed'));
+      return;
+    }
+
+    const { imported, skipped, errors } = data;
+    if(imported === 0 && skipped > 0){
+      showImportResult('error', `✕ No rows imported. ${skipped} row${skipped!==1?'s':''} had errors:\n` + errors.join('\n'));
+    } else if(skipped > 0){
+      let msg = `⚠ Imported ${imported} transaction${imported!==1?'s':''}, skipped ${skipped} row${skipped!==1?'s':''}.`;
+      if(errors.length) msg += '\n\nIssues:\n' + errors.join('\n');
+      showImportResult('warn', msg);
+      loadDashboard();
+    } else {
+      showImportResult('success', `✓ Successfully imported ${imported} transaction${imported!==1?'s':''}.`);
+      loadDashboard();
+    }
+
+    // Reset file input so the same file can be re-selected
+    document.getElementById('csv-file-input').value = '';
+
+  }catch(e){
+    zone.innerHTML = '<div class="csv-drop-icon">📂</div><div class="csv-drop-text"><strong>Click to choose a file</strong><br/>or drag &amp; drop it here</div>';
+    showImportResult('error', '✕ Network error. Please try again.');
+  }
+}
+
+function showImportResult(type, msg){
+  const el2 = document.getElementById('csv-import-result');
+  el2.className = 'csv-result ' + type;
+  el2.style.display = 'block';
+  el2.textContent = '';   // clear, then build with text nodes (no innerHTML with user data)
+  msg.split('\n').forEach((line, i) => {
+    if(i > 0) el2.appendChild(document.createElement('br'));
+    el2.appendChild(document.createTextNode(line));
+  });
 }
 
 // ── Boot ──────────────────────────────────────────────────────────

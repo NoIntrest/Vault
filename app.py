@@ -24,6 +24,7 @@ from routes.settings import settings_bp
 from routes.transactions import transactions_bp
 from routes.budget import budget_bp
 from routes.ai_chat import ai_bp
+from routes.csv_io import csv_bp
 
 # ── Logging ────────────────────────────────────────────────────────────────────
 logging.basicConfig(level=logging.INFO)
@@ -41,6 +42,7 @@ app.register_blueprint(settings_bp)
 app.register_blueprint(transactions_bp)
 app.register_blueprint(budget_bp)
 app.register_blueprint(ai_bp)
+app.register_blueprint(csv_bp)
 
 
 # ── Frontend ───────────────────────────────────────────────────────────────────
