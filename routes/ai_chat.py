@@ -12,6 +12,7 @@ from flask import Blueprint, jsonify, request, session
 from auth import login_required
 from config import GROQ_API_KEY, GROQ_MODEL
 from database import get_cursor
+from limiter import limiter
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,7 @@ ai_bp = Blueprint("ai", __name__)
 
 @ai_bp.route("/api/ai-chat", methods=["POST"])
 @login_required
+@limiter.limit("30 per minute")
 def ai_chat():
     data         = request.json or {}
     user_message = data.get("message", "").strip()

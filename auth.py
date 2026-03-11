@@ -17,6 +17,7 @@ from flask import Blueprint, jsonify, request, session
 
 from config import GROQ_API_KEY, GROQ_MODEL
 from database import get_cursor
+from limiter import limiter
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +52,7 @@ def login_required(f):
 # ── Routes ─────────────────────────────────────────────────────────────────────
 
 @auth_bp.route("/api/signup", methods=["POST"])
+@limiter.limit("10 per minute")
 def signup():
     data     = request.json or {}
     email    = data.get("email", "").strip().lower()
@@ -80,6 +82,7 @@ def signup():
 
 
 @auth_bp.route("/api/login", methods=["POST"])
+@limiter.limit("15 per minute")
 def login():
     data     = request.json or {}
     email    = data.get("email", "").strip().lower()

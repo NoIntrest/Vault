@@ -13,11 +13,10 @@ On Render (via Procfile):
 import logging
 
 from flask import Flask, render_template
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 from config import SECRET_KEY, DEBUG
 from database import init_db
+from limiter import limiter
 
 # ── Blueprints ─────────────────────────────────────────────────────────────────
 from auth import auth_bp
@@ -29,23 +28,12 @@ from routes.ai_chat import ai_bp
 # ── Logging ────────────────────────────────────────────────────────────────────
 logging.basicConfig(level=logging.INFO)
 
-# ── App factory ────────────────────────────────────────────────────────────────
+# ── App ────────────────────────────────────────────────────────────────────────
 app = Flask(__name__, template_folder="templates")
 app.secret_key = SECRET_KEY
 
-# ── Rate limiter ───────────────────────────────────────────────────────────────
-# In-memory storage is safe because Procfile sets --workers 1.
-limiter = Limiter(
-    get_remote_address,
-    app=app,
-    default_limits=[],
-    storage_uri="memory://",
-)
-
-# Apply per-route rate limits to auth endpoints
-limiter.limit("10 per minute")(auth_bp.view_functions["signup"])
-limiter.limit("15 per minute")(auth_bp.view_functions["login"])
-limiter.limit("30 per minute")(ai_bp.view_functions["ai_chat"])
+# Bind the shared limiter instance to this app
+limiter.init_app(app)
 
 # ── Register blueprints ────────────────────────────────────────────────────────
 app.register_blueprint(auth_bp)
